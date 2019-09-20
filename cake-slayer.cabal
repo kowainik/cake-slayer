@@ -1,4 +1,4 @@
-cabal-version:       2.0
+cabal-version:       2.4
 name:                cake-slayer
 version:             0.0.0.0
 synopsis:            Architecture of Haskel backend applications
@@ -7,28 +7,24 @@ homepage:            https://github.com/Holmusk/cake-slayer
 bug-reports:         https://github.com/Holmusk/cake-slayer/issues
 license:             MPL-2.0
 license-file:        LICENSE
-author:              Holmusk
-maintainer:          tech@holmusk.com
+author:              Dmitrii Kovanikov, Veronika Romashkina
+maintainer:          Holmusk <tech@holmusk.com>
 copyright:           2019 Holmusk
 category:            Web, Backend, Framework
 build-type:          Simple
 extra-doc-files:     README.md
-                   , CHANGELOG.md
+                     CHANGELOG.md
 tested-with:         GHC == 8.2.2
-                   , GHC == 8.4.4
-                   , GHC == 8.6.5
+                     GHC == 8.4.4
+                     GHC == 8.6.5
 
 source-repository head
   type:                git
   location:            https://github.com/Holmusk/cake-slayer.git
 
-library
-  hs-source-dirs:      src
-  exposed-modules:     CakeSlayer
-                       Prelude
-
+common common-options
   build-depends:       base-noprelude >= 4.10.1.0 && < 4.13
-                     , relude
+                     , relude ^>= 0.5.0
 
   ghc-options:         -Wall
                        -Wincomplete-uni-patterns
@@ -53,37 +49,22 @@ library
                        TypeApplications
                        ViewPatterns
 
+
+library
+  import:              common-options
+  hs-source-dirs:      src
+  other-modules:       Prelude
+  exposed-modules:     CakeSlayer
+
 test-suite cake-slayer-test
+  import:              common-options
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       Prelude
 
-  build-depends:       base-noprelude >= 4.10.1.0 && < 4.13
-                     , cake-slayer
-                     , relude
+  build-depends:       cake-slayer
 
-  ghc-options:         -Wall
-                       -threaded
+  ghc-options:         -threaded
                        -rtsopts
                        -with-rtsopts=-N
-                       -Wincomplete-uni-patterns
-                       -Wincomplete-record-updates
-                       -Wcompat
-                       -Widentities
-                       -Wredundant-constraints
-                       -fhide-source-paths
-
-  default-language:    Haskell2010
-  default-extensions:  ConstraintKinds
-                       DeriveGeneric
-                       GeneralizedNewtypeDeriving
-                       InstanceSigs
-                       KindSignatures
-                       LambdaCase
-                       OverloadedStrings
-                       RecordWildCards
-                       ScopedTypeVariables
-                       StandaloneDeriving
-                       TupleSections
-                       TypeApplications
-                       ViewPatterns
