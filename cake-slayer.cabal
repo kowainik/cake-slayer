@@ -41,10 +41,12 @@ common common-options
                        DeriveGeneric
                        DerivingStrategies
                        FlexibleContexts
+                       FlexibleInstances
                        GeneralizedNewtypeDeriving
                        InstanceSigs
                        KindSignatures
                        LambdaCase
+                       MultiParamTypeClasses
                        OverloadedStrings
                        RecordWildCards
                        ScopedTypeVariables

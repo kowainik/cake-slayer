@@ -1,7 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
-
-{- | This module introduces the type class 'Has'.
--}
+-- | This module introduces the type class 'Has'.
 
 module CakeSlayer.Has
        ( Has (..)
@@ -11,7 +8,23 @@ module CakeSlayer.Has
 
 {- | General type class representing which @field@ is in @env@.
 
-Instead of plain usage like this:
+Assuming that you have the following environment data type:
+
+@
+data Env = Env
+    { envJwtSecret :: !JwtSecret
+    , ...
+    }
+@
+
+Then you should first write instances for each field in the following manner:
+
+@
+instance Has JwtSecret Env where
+    obtain = envJwtSecret
+@
+
+After performing that actions, instead of plain usage like this:
 
 @
 foo :: MonadReader Env m => ...
@@ -19,7 +32,7 @@ foo = do
     secret <- asks jwtSecret
 @
 
-you should use 'Has' type class like this:
+you could use 'Has' type class like this:
 
 @
 foo :: (MonadReader env m, Has JwtSecret m) => ...
