@@ -26,7 +26,7 @@ import GHC.Stack (SrcLoc (SrcLoc, srcLocModule, srcLocStartLine))
 import qualified Control.Monad.Except as E (throwError)
 
 
-{- | Type alias for errors that have acess to 'CallStack'. Specicialise this
+{- | Type alias for errors that has access to 'CallStack'. Specialise this
 constraint in your code to monomorphic error data type like this:
 
 @
