@@ -79,7 +79,7 @@ newtype AppException err = AppException
     } deriving stock (Show)
       deriving anyclass (Exception)
 
-{- | Helper to convert 'err' into something that can be thrown
+{- | Helper to convert @err@ into something that can be thrown
 when you don't have the ability to specify the 'SourcePosition'.
 -}
 toNoSourceException :: err -> AppException err
