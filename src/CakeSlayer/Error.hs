@@ -1,4 +1,40 @@
 {- | This module contains types ans functions for the app error customization.
+In your application you should create your custom error data type like this one:
+
+@
+- | App errors type.
+__data__ AppErrorType
+    {- | General not found. -}
+    = NotFound
+
+    {- | Some exceptional circumstance has happened to stop execution and return.
+    Optional text to provide some context in server logs.
+    -}
+    | ServerError Text
+
+    {- | A required permission level was not met. Optional text to provide some context. -}
+    | NotAllowed Text
+
+    {- | Given inputs do not conform to the expected format or shape. Optional
+    text to provide some context in server logs.
+    -}
+    | Invalid Text
+
+    {- | Some header expected, but not present in header list.
+    -}
+    | MissingHeader HeaderName
+
+    {- | An authentication header that was required was provided but not in a
+    format that the server can understand.
+    -}
+    | HeaderDecodeError Text
+
+    {- | Data base specific errors. -}
+    | DbError Text
+@
+
+Then, after specializing 'WithError' you can throw and catch pure errors that
+also have source code position attached to them automatically.
 -}
 
 module CakeSlayer.Error
@@ -6,6 +42,7 @@ module CakeSlayer.Error
          WithError
        , ErrorWithSource (..)
        , throwError
+       , catchError
 
          -- * Exceptions
        , AppException (..)
@@ -23,7 +60,7 @@ module CakeSlayer.Error
 import Control.Monad.Except (MonadError)
 import GHC.Stack (SrcLoc (SrcLoc, srcLocModule, srcLocStartLine))
 
-import qualified Control.Monad.Except as E (throwError)
+import qualified Control.Monad.Except as E (catchError, throwError)
 
 
 {- | Type alias for errors that has access to 'CallStack'. Specialise this
@@ -38,8 +75,8 @@ type WithError err m = (MonadError (ErrorWithSource err) m, HasCallStack)
 {- | Wrapper around error type with attached source code position.
 -}
 data ErrorWithSource err = ErrorWithSource
-    { appErrorCallStack :: !SourcePosition
-    , appErrorType      :: !err
+    { errorWithSourceCallStack :: !SourcePosition
+    , errorWithSourceType      :: !err
     } deriving stock (Show, Eq, Functor)
 
 {- | Specialized version of 'E.throwError' that attaches source code position of
@@ -49,8 +86,17 @@ throwError :: WithError err m => err -> m a
 throwError = E.throwError . ErrorWithSource (toSourcePosition callStack)
 {-# INLINE throwError #-}
 
-newtype SourcePosition = SourcePosition Text
-    deriving newtype (Show, Eq)
+{- | Specialized version of 'E.catchError'.
+-}
+catchError :: WithError err m => m a -> (err -> m a) -> m a
+catchError action handler = action `E.catchError` (handler . errorWithSourceType)
+{-# INLINE catchError #-}
+
+{- | Formatted source code position. See 'toSourcePosition' for more details.
+-}
+newtype SourcePosition = SourcePosition
+    { unSourcePosition :: Text
+    } deriving newtype (Show, Eq)
 
 {- | Display 'CallStack' as 'SourcePosition' in the following format:
 
