@@ -36,7 +36,11 @@ common common-options
 
   default-language:    Haskell2010
   default-extensions:  ConstraintKinds
+                       DeriveAnyClass
+                       DeriveFunctor
                        DeriveGeneric
+                       DerivingStrategies
+                       FlexibleContexts
                        GeneralizedNewtypeDeriving
                        InstanceSigs
                        KindSignatures
@@ -55,6 +59,9 @@ library
   hs-source-dirs:      src
   other-modules:       Prelude
   exposed-modules:     CakeSlayer
+                         CakeSlayer.Error
+
+  build-depends:       mtl ^>= 2.2.2
 
 test-suite cake-slayer-test
   import:              common-options

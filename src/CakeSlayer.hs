@@ -1,6 +1,5 @@
 module CakeSlayer
-       ( someFunc
+       ( module CakeSlayer.Error
        ) where
 
-someFunc :: IO ()
-someFunc = putStrLn ("someFunc" :: String)
+import CakeSlayer.Error
