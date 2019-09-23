@@ -60,6 +60,7 @@ library
   other-modules:       Prelude
   exposed-modules:     CakeSlayer
                          CakeSlayer.Error
+                         CakeSlayer.Has
 
   build-depends:       mtl ^>= 2.2.2
 
