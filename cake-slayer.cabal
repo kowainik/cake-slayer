@@ -62,16 +62,22 @@ library
   exposed-modules:     CakeSlayer
                          CakeSlayer.Error
                          CakeSlayer.Has
+                         CakeSlayer.Jwt
                          CakeSlayer.Monad
                          CakeSlayer.Password
                          CakeSlayer.Random
 
-  build-depends:       aeson >= 1.4
+  build-depends:       aeson ^>= 1.4
                      , bcrypt ^>= 0.0.11
+                     , containers
                      , elm-street ^>= 0.1.0.2
+                     , http-api-data ^>= 0.4
+                     , jwt ^>= 0.10.0
                      , mtl ^>= 2.2.2
                      , postgresql-simple ^>= 0.6.2
                      , random ^>= 1.1
+                     , scientific ^>= 0.3.6
+                     , time >= 1.8 && < 1.10
                      , unliftio-core ^>= 0.1.2.0
 
 test-suite cake-slayer-test
@@ -80,11 +86,14 @@ test-suite cake-slayer-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       Prelude
+                       Test.Gen
+                       Test.Jwt
                        Test.Password
 
   build-depends:       cake-slayer
                      , bcrypt
                      , hedgehog ^>= 1.0.1
+                     , jwt
 
   ghc-options:         -threaded
                        -rtsopts

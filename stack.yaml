@@ -2,3 +2,4 @@ resolver: lts-14.7
 
 extra-deps:
   - elm-street-0.1.0.2
+

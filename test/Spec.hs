@@ -3,16 +3,24 @@ module Main (main) where
 import Hedgehog (Group (..), checkParallel)
 import System.IO (hSetEncoding, utf8)
 
+import CakeSlayer.Jwt (decodeIntIdPayload, decodeTextIdPayload, encodeIntIdPayload,
+                       encodeTextIdPayload)
+import Test.Gen (genInt, genText)
+import Test.Jwt (jwtRoundtrip)
 import Test.Password (pwdHashVerify)
 
 
 hedgehogTests :: Group
 hedgehogTests = Group "Roundtrip properties"
-    [ pwdHashVerify `named` "verify . hash ≡ True"
+    [ "verify  . hash        ≡ True" `named` pwdHashVerify
+    , "fromMap . toMap @Int  ≡ Just" `named`
+        jwtRoundtrip genInt encodeIntIdPayload decodeIntIdPayload
+    , "fromMap . toMap @Text ≡ Just" `named`
+        jwtRoundtrip genText encodeTextIdPayload decodeTextIdPayload
     ]
   where
-    named :: a -> b -> (b, a)
-    named = flip (,)
+    named :: a -> b -> (a, b)
+    named = (,)
 
 main :: IO ()
 main =  do
