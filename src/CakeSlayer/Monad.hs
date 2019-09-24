@@ -1,4 +1,4 @@
-{- | This module implements main monad for your application. Sub
+{- | This module implements the main monad for your application.
 
 It should be used in the following way:
 
