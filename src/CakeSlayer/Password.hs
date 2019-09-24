@@ -1,0 +1,74 @@
+-- | User passwords. Uses @bcrypt@ password hashing.
+
+module CakeSlayer.Password
+       ( PasswordHash (unPasswordHash)
+       , PasswordPlainText (..)
+       , unsafePwdHash
+       , mkPasswordHashWithPolicy
+       , mkPasswordHash
+       , verifyPassword
+       , generateRandomPassword
+       ) where
+
+import Data.Aeson (FromJSON, ToJSON)
+import Database.PostgreSQL.Simple.FromField (FromField)
+import Database.PostgreSQL.Simple.ToField (ToField)
+import Elm (Elm)
+
+import CakeSlayer.Error (WithError, throwOnNothingM)
+import CakeSlayer.Random (mkRandomString)
+
+import qualified Crypto.BCrypt as BC
+
+
+-- | Password hash.
+newtype PasswordHash = PasswordHash
+    { unPasswordHash :: Text
+    } deriving stock (Show, Generic)
+      deriving newtype (Eq, FromField, ToField, FromJSON, ToJSON, Elm)
+
+-- | Unsafe function for constructing 'PasswordHash'. Used mostly for testing.
+unsafePwdHash :: Text -> PasswordHash
+unsafePwdHash = PasswordHash
+
+-- | Password in plain text.
+newtype PasswordPlainText = PasswordPlainText
+    { unPasswordPlainText :: Text
+    } deriving stock (Show, Generic)
+      deriving newtype (Eq, FromJSON, ToJSON, Elm)
+
+
+-- | Generates a password hash given the hashing policy and its plane text.
+-- This has to be done in IO asy generating the salt requires RNG.
+mkPasswordHashWithPolicy
+    :: forall m err . (WithError err m, MonadIO m)
+    => err
+    -> BC.HashingPolicy
+    -> PasswordPlainText
+    -> m PasswordHash
+mkPasswordHashWithPolicy errorMessage hashPolicy password =
+    throwOnNothingM errorMessage hashText
+  where
+    hashBS :: m (Maybe ByteString)
+    hashBS = liftIO $ BC.hashPasswordUsingPolicy
+        hashPolicy
+        (encodeUtf8 $ unPasswordPlainText password)
+
+    hashText :: m (Maybe PasswordHash)
+    hashText = PasswordHash . decodeUtf8 <<$>> hashBS
+
+-- | Generates the password hash with slow hashing policy.
+mkPasswordHash
+    :: (WithError err m, MonadIO m)
+    => err
+    -> PasswordPlainText
+    -> m PasswordHash
+mkPasswordHash err = mkPasswordHashWithPolicy err BC.slowerBcryptHashingPolicy
+
+verifyPassword :: PasswordPlainText -> PasswordHash -> Bool
+verifyPassword (PasswordPlainText password) (PasswordHash hash) =
+    BC.validatePassword (encodeUtf8 hash) (encodeUtf8 password)
+
+-- | Generate random password of the given length.
+generateRandomPassword :: MonadIO m => Int -> m PasswordPlainText
+generateRandomPassword n = PasswordPlainText <$> mkRandomString n
