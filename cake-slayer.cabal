@@ -63,8 +63,10 @@ library
   exposed-modules:     CakeSlayer
                          CakeSlayer.Error
                          CakeSlayer.Has
+                         CakeSlayer.Monad
 
   build-depends:       mtl ^>= 2.2.2
+                     , unliftio-core ^>= 0.1.2.0
 
 test-suite cake-slayer-test
   import:              common-options
