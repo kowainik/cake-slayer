@@ -42,7 +42,7 @@ newtype App (err :: Type) env a = App
                        , MonadReader env, MonadIO, MonadUnliftIO)
 
 {- | This instance allows to throw and catch errors that are visible in type
-definitions. The implementation relies on underlying IO machinery.
+definitions. The implementation relies on underlying 'IO' machinery.
 
 Use 'CakeSlayer.Error.throwError' and 'CakeSlayer.Error.catchError': these
 functions automatically attach source code positions to errors.
