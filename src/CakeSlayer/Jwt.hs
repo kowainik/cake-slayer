@@ -1,4 +1,4 @@
-{- | This module provides convenience wrappers around JWT provided by @jwt@
+{- | This module provides convenient wrappers around JWT provided by @jwt@
 Haskell library. These tokens are used to authenticate users and store
 additional payload on user log in, for example, user id.
 -}
