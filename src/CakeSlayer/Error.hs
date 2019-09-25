@@ -43,6 +43,7 @@ module CakeSlayer.Error
        , ErrorWithSource (..)
        , throwError
        , catchError
+       , liftError
 
          -- * Exceptions
        , AppException (..)
@@ -91,6 +92,12 @@ throwError = E.throwError . ErrorWithSource (toSourcePosition callStack)
 catchError :: WithError err m => m a -> (err -> m a) -> m a
 catchError action handler = action `E.catchError` (handler . errorWithSourceType)
 {-# INLINE catchError #-}
+
+{- | Lift errors from 'Either' by rethrowing them with attached source position.
+-}
+liftError :: WithError e m => Either e a -> m a
+liftError = either throwError pure
+{-# INLINE liftError #-}
 
 {- | Formatted source code position. See 'toSourcePosition' for more details.
 -}
