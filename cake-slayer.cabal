@@ -60,6 +60,7 @@ library
   hs-source-dirs:      src
   other-modules:       Prelude
   exposed-modules:     CakeSlayer
+                         CakeSlayer.Db
                          CakeSlayer.Error
                          CakeSlayer.Has
                          CakeSlayer.Jwt
@@ -75,7 +76,10 @@ library
                      , jwt ^>= 0.10.0
                      , mtl ^>= 2.2.2
                      , postgresql-simple ^>= 0.6.2
+                     , postgresql-simple-migration ^>= 0.1.14.0
+                     , postgresql-simple-named ^>= 0.0.2.0
                      , random ^>= 1.1
+                     , resource-pool ^>= 0.2.3.2
                      , scientific ^>= 0.3.6
                      , time >= 1.8 && < 1.10
                      , unliftio-core ^>= 0.1.2.0
