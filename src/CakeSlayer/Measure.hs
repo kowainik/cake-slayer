@@ -6,7 +6,12 @@ apply some metric calculations on actions, e.g. taken time.
 
 module CakeSlayer.Measure
        ( MonadMeasure
-       , timedAction
+
+       , MonadTimed (..)
+
+         -- * Environment types
+       , Timings
+       , PrometheusRegistry
 
          -- * Internals
        , timedActionImpl
@@ -24,6 +29,7 @@ import qualified Data.Map as Map
 import qualified System.Metrics as Metrics
 import qualified System.Metrics.Distribution as Distribution
 
+
 {- | This type class is used to perform action and measure time and other
 metrics needed to be performed.
 -}
@@ -31,10 +37,10 @@ class Monad m => MonadTimed m where
     timedAction :: HasCallStack => m a -> m a
 
 
--- QUESTION: move to CakeSlayer.Env ?
 type Timings = IORef (Map Text Distribution)
 type PrometheusRegistry = IORef (HashMap Text Histogram)
 
+-- | Constraint for the monadic actions that have access to measurements.
 type MonadMeasure m = (HasCallStack, MonadTimed m)
 
 {- | Helper function to be used in instance implementations.
