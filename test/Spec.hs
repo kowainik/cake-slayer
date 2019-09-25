@@ -12,10 +12,10 @@ import Test.Password (pwdHashVerify)
 
 hedgehogTests :: Group
 hedgehogTests = Group "Roundtrip properties"
-    [ "verify  . hash        ≡ True" `named` pwdHashVerify
-    , "fromMap . toMap @Int  ≡ Just" `named`
+    [ "verify     . hash           ≡ True" `named` pwdHashVerify
+    , "fromJwtMap . toJwtMap @Int  ≡ Just" `named`
         jwtRoundtrip genInt encodeIntIdPayload decodeIntIdPayload
-    , "fromMap . toMap @Text ≡ Just" `named`
+    , "fromJwtMap . toJwtMap @Text ≡ Just" `named`
         jwtRoundtrip genText encodeTextIdPayload decodeTextIdPayload
     ]
   where
