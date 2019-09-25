@@ -24,7 +24,7 @@ import qualified Crypto.BCrypt as BC
 newtype PasswordHash = PasswordHash
     { unPasswordHash :: Text
     } deriving stock (Show, Generic)
-      deriving newtype (Eq, FromField, ToField, FromJSON, ToJSON, Elm)
+      deriving newtype (Eq, FromField, ToField)
 
 -- | Unsafe function for constructing 'PasswordHash'. Used only for testing.
 unsafePwdHash :: Text -> PasswordHash
@@ -34,14 +34,15 @@ unsafePwdHash = PasswordHash
 newtype PasswordPlainText = PasswordPlainText
     { unPasswordPlainText :: Text
     } deriving stock (Show, Generic)
-      deriving newtype (Eq, FromJSON, ToJSON, Elm)
+      deriving newtype (Eq, FromJSON, ToJSON)
+      deriving anyclass (Elm)
 
 
 {- | Generates a password hash given the hashing policy and its plane text.
 This has to be done in 'MonadIO' as generating the salt requires RNG.
 
-The fast 'BC.HashingPolicy' ('BC.fastBcryptHashingPolicy') should be used for
-tests only. For production use 'BC.slowerBcryptHashingPolicy', or just
+The fast 'BC.HashingPolicy' ('BC.fastBcryptHashingPolicy') should be used
+for tests only. For production use 'BC.slowerBcryptHashingPolicy', or just
 'mkPasswordHash' function that already implies this.
 -}
 mkPasswordHashWithPolicy
