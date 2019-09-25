@@ -64,6 +64,7 @@ library
                          CakeSlayer.Error
                          CakeSlayer.Has
                          CakeSlayer.Jwt
+                         CakeSlayer.Measure
                          CakeSlayer.Monad
                          CakeSlayer.Password
                          CakeSlayer.Random
@@ -71,6 +72,7 @@ library
   build-depends:       aeson ^>= 1.4
                      , bcrypt ^>= 0.0.11
                      , containers
+                     , ekg-core ^>= 0.1.1.6
                      , elm-street ^>= 0.1.0.2
                      , http-api-data ^>= 0.4
                      , jwt ^>= 0.10.0
@@ -78,11 +80,13 @@ library
                      , postgresql-simple ^>= 0.6.2
                      , postgresql-simple-migration ^>= 0.1.14.0
                      , postgresql-simple-named ^>= 0.0.2.0
+                     , prometheus-client ^>= 1.0.0
                      , random ^>= 1.1
                      , resource-pool ^>= 0.2.3.2
                      , scientific ^>= 0.3.6
                      , time >= 1.8 && < 1.10
                      , unliftio-core ^>= 0.1.2.0
+                     , unordered-containers ^>= 0.2.10.0
 
 test-suite cake-slayer-test
   import:              common-options
