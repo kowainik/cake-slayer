@@ -71,7 +71,7 @@ library
                      , bcrypt ^>= 0.0.11
                      , elm-street ^>= 0.1.0.2
                      , mtl ^>= 2.2.2
-                     , postgresql-simple ^>= 0.6.1
+                     , postgresql-simple ^>= 0.6.2
                      , random ^>= 1.1
                      , unliftio-core ^>= 0.1.2.0
 
@@ -85,7 +85,7 @@ test-suite cake-slayer-test
 
   build-depends:       cake-slayer
                      , bcrypt
-                     , hedgehog ^>= 0.6.1
+                     , hedgehog ^>= 1.0.1
 
   ghc-options:         -threaded
                        -rtsopts

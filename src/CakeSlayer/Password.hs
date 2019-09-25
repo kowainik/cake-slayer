@@ -15,7 +15,6 @@ import Database.PostgreSQL.Simple.FromField (FromField)
 import Database.PostgreSQL.Simple.ToField (ToField)
 import Elm (Elm)
 
-import CakeSlayer.Error (WithError, throwOnNothingM)
 import CakeSlayer.Random (mkRandomString)
 
 import qualified Crypto.BCrypt as BC
@@ -27,7 +26,7 @@ newtype PasswordHash = PasswordHash
     } deriving stock (Show, Generic)
       deriving newtype (Eq, FromField, ToField, FromJSON, ToJSON, Elm)
 
--- | Unsafe function for constructing 'PasswordHash'. Used mostly for testing.
+-- | Unsafe function for constructing 'PasswordHash'. Used only for testing.
 unsafePwdHash :: Text -> PasswordHash
 unsafePwdHash = PasswordHash
 
@@ -38,32 +37,32 @@ newtype PasswordPlainText = PasswordPlainText
       deriving newtype (Eq, FromJSON, ToJSON, Elm)
 
 
--- | Generates a password hash given the hashing policy and its plane text.
--- This has to be done in IO asy generating the salt requires RNG.
+{- | Generates a password hash given the hashing policy and its plane text.
+This has to be done in 'MonadIO' as generating the salt requires RNG.
+
+The fast 'BC.HashingPolicy' ('BC.fastBcryptHashingPolicy') should be used for
+tests only. For production use 'BC.slowerBcryptHashingPolicy', or just
+'mkPasswordHash' function that already implies this.
+-}
 mkPasswordHashWithPolicy
-    :: forall m err . (WithError err m, MonadIO m)
-    => err
-    -> BC.HashingPolicy
+    :: forall m . (MonadIO m)
+    => BC.HashingPolicy
     -> PasswordPlainText
-    -> m PasswordHash
-mkPasswordHashWithPolicy errorMessage hashPolicy password =
-    throwOnNothingM errorMessage hashText
+    -> m (Maybe PasswordHash)
+mkPasswordHashWithPolicy hashPolicy password =
+    PasswordHash . decodeUtf8 <<$>> hashBS
   where
     hashBS :: m (Maybe ByteString)
     hashBS = liftIO $ BC.hashPasswordUsingPolicy
         hashPolicy
         (encodeUtf8 $ unPasswordPlainText password)
 
-    hashText :: m (Maybe PasswordHash)
-    hashText = PasswordHash . decodeUtf8 <<$>> hashBS
-
 -- | Generates the password hash with slow hashing policy.
 mkPasswordHash
-    :: (WithError err m, MonadIO m)
-    => err
-    -> PasswordPlainText
-    -> m PasswordHash
-mkPasswordHash err = mkPasswordHashWithPolicy err BC.slowerBcryptHashingPolicy
+    :: (MonadIO m)
+    => PasswordPlainText
+    -> m (Maybe PasswordHash)
+mkPasswordHash = mkPasswordHashWithPolicy BC.slowerBcryptHashingPolicy
 
 verifyPassword :: PasswordPlainText -> PasswordHash -> Bool
 verifyPassword (PasswordPlainText password) (PasswordHash hash) =
