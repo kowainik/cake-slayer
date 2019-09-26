@@ -68,6 +68,7 @@ library
                          CakeSlayer.Monad
                          CakeSlayer.Password
                          CakeSlayer.Random
+                         CakeSlayer.Time
 
   build-depends:       aeson ^>= 1.4
                      , bcrypt ^>= 0.0.11

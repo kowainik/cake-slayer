@@ -37,6 +37,7 @@ import Elm (Elm)
 import Web.HttpApiData (FromHttpApiData)
 
 import CakeSlayer.Has (Has, grab)
+import CakeSlayer.Time (Seconds (..))
 
 import qualified Data.Aeson as Json
 import qualified Data.Map as Map
@@ -140,7 +141,7 @@ TODO: parametrize 'JwtPayload' when we figure out how to do this
 -}
 class Monad m => MonadJwt m where
     mkJwtToken
-        :: Int              -- ^ Token expiry in seconds
+        :: Seconds          -- ^ Token expiry in seconds
         -> JwtPayload Text  -- ^ Payload to code;
         -> m JwtToken       -- ^ Encoded token
 
@@ -151,13 +152,13 @@ class Monad m => MonadJwt m where
 -- | Default implementation of token creation.
 mkJwtTokenImpl
     :: (MonadIO m, MonadReader env m, Has JwtSecret env)
-    => Int
+    => Seconds
     -> JwtPayload Text
     -> m JwtToken
 mkJwtTokenImpl expiry payload = do
     secret  <- Jwt.hmacSecret . unJwtSecret <$> grab @JwtSecret
     timeNow <- liftIO getPOSIXTime
-    let expiryTime = timeNow + fromIntegral expiry
+    let expiryTime = timeNow + fromIntegral (unSeconds expiry)
     let claimsSet = mempty
             { Jwt.exp = Jwt.numericDate expiryTime
             , Jwt.unregisteredClaims = encodeTextIdPayload payload
