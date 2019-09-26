@@ -18,6 +18,7 @@ module CakeSlayer.Db
        , execute
        , executeMany
        , executeNamed
+       , executeNamed_
        , returning
 
          -- * Migrations
@@ -129,8 +130,20 @@ executeNamed
     -> [NamedParam]
     -> m Int64
 executeNamed q params =
-  withPool (\conn -> runExceptT $ Sql.executeNamed conn q params) >>= liftError
+    withPool (\conn -> runExceptT $ Sql.executeNamed conn q params) >>= liftError
 {-# INLINE executeNamed #-}
+
+{- | Executes a query with named parameters. Like 'executeNamed' but doesn't
+return number of affected columns.
+-}
+executeNamed_
+    :: (WithError PgNamedError m, WithDb env m)
+    => Sql.Query
+    -> [NamedParam]
+    -> m ()
+executeNamed_ q params =
+    withPool (\conn -> runExceptT $ Sql.executeNamed_ conn q params) >>= liftError
+{-# INLINE executeNamed_ #-}
 
 returning
     :: (WithDb env m, ToRow args, FromRow res)
