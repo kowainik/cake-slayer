@@ -135,42 +135,46 @@ payloadFromMap fromValue (Jwt.ClaimsMap claimsMap) =
 -- Secret
 ----------------------------------------------------------------------------
 
-{- | This monad represents effect to create and verify JWT.
+{- | This monad represents effect to create and verify JWT. It has two type
+variables:
 
-TODO: parametrize 'JwtPayload' when we figure out how to do this
+* @payload@: type of JWT payload.
+* @m@: monad itself
 -}
-class Monad m => MonadJwt m where
+class Monad m => MonadJwt payload m where
     mkJwtToken
-        :: Seconds          -- ^ Token expiry in seconds
-        -> JwtPayload Text  -- ^ Payload to code;
-        -> m JwtToken       -- ^ Encoded token
+        :: Seconds             -- ^ Token expiry in seconds
+        -> JwtPayload payload  -- ^ Payload to code
+        -> m JwtToken          -- ^ Encoded token
 
     verifyJwtToken
         :: JwtToken  -- ^ Token which stores payload
-        -> m (Maybe (JwtPayload Text))  -- ^ Decoded payload if token valid
+        -> m (Maybe (JwtPayload payload))  -- ^ Decoded payload if token valid
 
 -- | Default implementation of token creation.
 mkJwtTokenImpl
     :: (MonadIO m, MonadReader env m, Has JwtSecret env)
-    => Seconds
-    -> JwtPayload Text
+    => (JwtPayload payload -> Jwt.ClaimsMap)
+    -> Seconds
+    -> JwtPayload payload
     -> m JwtToken
-mkJwtTokenImpl expiry payload = do
+mkJwtTokenImpl encode expiry payload = do
     secret  <- Jwt.hmacSecret . unJwtSecret <$> grab @JwtSecret
     timeNow <- liftIO getPOSIXTime
     let expiryTime = timeNow + fromIntegral (unSeconds expiry)
     let claimsSet = mempty
             { Jwt.exp = Jwt.numericDate expiryTime
-            , Jwt.unregisteredClaims = encodeTextIdPayload payload
+            , Jwt.unregisteredClaims = encode payload
             }
     pure $ JwtToken $ Jwt.encodeSigned secret mempty claimsSet
 
 -- | Default implementation of token validation.
 verifyJwtTokenImpl
     :: (MonadIO m, MonadReader env m, Has JwtSecret env)
-    => JwtToken
-    -> m (Maybe (JwtPayload Text))
-verifyJwtTokenImpl (JwtToken token) = do
+    => (Jwt.ClaimsMap -> Maybe (JwtPayload payload))
+    -> JwtToken
+    -> m (Maybe (JwtPayload payload))
+verifyJwtTokenImpl decode (JwtToken token) = do
     secret <- Jwt.hmacSecret . unJwtSecret <$> grab @JwtSecret
     timeNow <- Jwt.numericDate <$> liftIO getPOSIXTime
     pure $ do
@@ -178,4 +182,4 @@ verifyJwtTokenImpl (JwtToken token) = do
         expiryTimeStatedInToken <- Jwt.exp claimsSet
         now <- timeNow
         guard (expiryTimeStatedInToken >= now)
-        decodeTextIdPayload $ Jwt.unregisteredClaims claimsSet
+        decode $ Jwt.unregisteredClaims claimsSet

@@ -6,7 +6,7 @@ import System.IO (hSetEncoding, utf8)
 import CakeSlayer.Jwt (decodeIntIdPayload, decodeTextIdPayload, encodeIntIdPayload,
                        encodeTextIdPayload)
 import Test.Gen (genInt, genText)
-import Test.Jwt (jwtRoundtrip)
+import Test.Jwt (createAndVerifyJwt, jwtRoundtrip)
 import Test.Password (pwdHashVerify)
 
 
@@ -17,6 +17,7 @@ hedgehogTests = Group "Roundtrip properties"
         jwtRoundtrip genInt encodeIntIdPayload decodeIntIdPayload
     , "fromJwtMap . toJwtMap @Text ≡ Just" `named`
         jwtRoundtrip genText encodeTextIdPayload decodeTextIdPayload
+    , "verifyJwt  . createJwt      ≡ True" `named` createAndVerifyJwt
     ]
   where
     named :: a -> b -> (a, b)

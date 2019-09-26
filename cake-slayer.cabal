@@ -97,6 +97,7 @@ test-suite cake-slayer-test
   other-modules:       Prelude
                        Test.Gen
                        Test.Jwt
+                       Test.Mock
                        Test.Password
 
   build-depends:       cake-slayer
