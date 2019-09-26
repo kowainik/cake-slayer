@@ -14,6 +14,7 @@ module CakeSlayer.Measure
        , PrometheusRegistry
 
          -- * Internals
+       , timedActionSimpleImpl
        , timedActionImpl
        ) where
 
@@ -43,6 +44,48 @@ type PrometheusRegistry = IORef (HashMap Text Histogram)
 -- | Constraint for the monadic actions that have access to measurements.
 type MonadMeasure m = (HasCallStack, MonadTimed m)
 
+{- | Basic implementation of 'timeAction' function for 'MonadTimed' instances.
+
+It measures the time taken to perform the given action and store it
+in the @timings@ distribution with the label of the action.
+
+It also receives any function that work with metrics. This function can use
+label and time data inside.
+-}
+timedActionSimpleImpl
+    :: forall r m a .
+       ( MonadReader r m
+       , Has Timings r
+       , Has Metrics.Store r
+       , MonadIO m
+       , HasCallStack
+       )
+    => (Text -> Double -> m ())  -- ^ any given metrics collection actions.
+    -> Text  -- ^ Global name
+    -> m a   -- ^ Action
+    -> m a
+timedActionSimpleImpl metricsAct nm action = do
+    start <- liftIO getCPUTime
+    !result <- action
+    end <- liftIO getCPUTime
+    let !timeTaken = fromIntegral (end - start) * 1e-12
+    dist <- getOrCreateDistribution $ toText ownName
+    liftIO $ Distribution.add dist timeTaken
+    metricsAct (toText ownName) timeTaken
+    pure result
+  where
+    getOrCreateDistribution :: Text -> m Distribution
+    getOrCreateDistribution label = do
+        timingsRef <- grab @Timings
+        store      <- grab @Metrics.Store
+        liftIO $ do
+            distMap <- readIORef timingsRef
+            whenNothing (Map.lookup label distMap) $ do
+                newDist <- Metrics.createDistribution label store
+                modifyIORef' timingsRef (Map.insert label newDist)
+                return newDist
+
+
 {- | Helper function to be used in instance implementations.
 
 It measures the time taken to perform the given action and store it
@@ -63,15 +106,7 @@ timedActionImpl
     => Text  -- ^ Global name
     -> m a   -- ^ Action
     -> m a
-timedActionImpl nm action = do
-    start <- liftIO getCPUTime
-    !result <- action
-    end <- liftIO getCPUTime
-    let !timeTaken = fromIntegral (end - start) * 1e-12
-    dist <- getOrCreateDistribution $ toText ownName
-    liftIO $ Distribution.add dist timeTaken
-    registerWithPrometheus (toText ownName) timeTaken
-    pure result
+timedActionImpl nm = timedActionSimpleImpl registerWithPrometheus nm
   where
     registerWithPrometheus :: Text -> Double -> m ()
     registerWithPrometheus label reading = do
@@ -83,15 +118,3 @@ timedActionImpl nm action = do
                 newHist <- register $ histogram (Prometheus.Info nm label) defaultBuckets
                 () <$ atomicModifyIORef' promRef (\pHashMap -> (HashMap.insert label newHist pHashMap, ()))
                 observe newHist reading
-
-
-    getOrCreateDistribution :: Text -> m Distribution
-    getOrCreateDistribution label = do
-        timingsRef <- grab @Timings
-        store      <- grab @Metrics.Store
-        liftIO $ do
-            distMap <- readIORef timingsRef
-            whenNothing (Map.lookup label distMap) $ do
-                newDist <- Metrics.createDistribution label store
-                modifyIORef' timingsRef (Map.insert label newDist)
-                return newDist
