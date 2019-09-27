@@ -14,8 +14,9 @@ module CakeSlayer.Measure
        , PrometheusRegistry
 
          -- * Internals
+       , timedActionImplWith
        , timedActionSimpleImpl
-       , timedActionImpl
+       , timedActionPrometheusImpl
        ) where
 
 import Prometheus (Histogram, Info (..), MonadMonitor, defaultBuckets, histogram, observe, register)
@@ -51,8 +52,20 @@ in the @timings@ distribution with the label of the action.
 
 It also receives any function that work with metrics. This function can use
 label and time data inside.
+
+__Usage examples:__
+
+@
+__instance__ 'MonadTimed' App __where__
+    'timedAction' = timedActionImplWith myMetrics
+      __where__
+        myMetrics :: 'Text' -> 'Double' -> App ()
+        myMetrics label time = __do__
+            prometheusMetrics label time
+            otherMetrics lebel time
+@
 -}
-timedActionSimpleImpl
+timedActionImplWith
     :: forall r m a .
        ( MonadReader r m
        , Has Timings r
@@ -64,7 +77,7 @@ timedActionSimpleImpl
     -> Text  -- ^ Global name
     -> m a   -- ^ Action
     -> m a
-timedActionSimpleImpl metricsAct nm action = do
+timedActionImplWith metricsAct _nm action = do
     start <- liftIO getCPUTime
     !result <- action
     end <- liftIO getCPUTime
@@ -85,6 +98,23 @@ timedActionSimpleImpl metricsAct nm action = do
                 modifyIORef' timingsRef (Map.insert label newDist)
                 return newDist
 
+{- | Helper function to be used in instance implementations.
+
+This is a simple version which doesn't add any other metrics.
+-}
+timedActionSimpleImpl
+    :: forall r m a .
+       ( MonadReader r m
+       , Has Timings r
+       , Has Metrics.Store r
+       , MonadIO m
+       , HasCallStack
+       )
+    => Text  -- ^ Global name
+    -> m a   -- ^ Action
+    -> m a
+timedActionSimpleImpl = timedActionImplWith (\_ _ -> pass)
+
 
 {- | Helper function to be used in instance implementations.
 
@@ -93,7 +123,7 @@ in the @timings@ distribution with the label of the action.
 
 This is a recommended implementation which has the integration with @prometheus@.
 -}
-timedActionImpl
+timedActionPrometheusImpl
     :: forall r m a .
        ( MonadReader r m
        , Has Timings r
@@ -106,7 +136,7 @@ timedActionImpl
     => Text  -- ^ Global name
     -> m a   -- ^ Action
     -> m a
-timedActionImpl nm = timedActionSimpleImpl registerWithPrometheus nm
+timedActionPrometheusImpl nm = timedActionImplWith registerWithPrometheus nm
   where
     registerWithPrometheus :: Text -> Double -> m ()
     registerWithPrometheus label reading = do
