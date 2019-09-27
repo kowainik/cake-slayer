@@ -29,6 +29,8 @@ common common-options
                      , relude (Relude as Prelude
                               , Relude.Extra.Bifunctor
                               , Relude.Extra.CallStack
+                              , Relude.Extra.Lens
+                              , Relude.Extra.Type
                               , Relude.Unsafe
                               )
 
@@ -74,6 +76,7 @@ library
                          CakeSlayer.Monad
                          CakeSlayer.Password
                          CakeSlayer.Random
+                         CakeSlayer.Swagger
                          CakeSlayer.Time
 
   build-depends:       aeson ^>= 1.4
@@ -91,6 +94,7 @@ library
                      , random ^>= 1.1
                      , resource-pool ^>= 0.2.3.2
                      , scientific ^>= 0.3.6
+                     , swagger2 ^>= 2.4
                      , time >= 1.8 && < 1.10
                      , unliftio-core ^>= 0.1.2.0
                      , unordered-containers ^>= 0.2.10.0
