@@ -22,8 +22,15 @@ source-repository head
   location:            https://github.com/Holmusk/cake-slayer.git
 
 common common-options
-  build-depends:       base-noprelude >= 4.10.1.0 && < 4.13
+  build-depends:       base >= 4.11.0.0 && < 4.13
                      , relude ^>= 0.5.0
+
+  mixins:              base hiding (Prelude)
+                     , relude (Relude as Prelude
+                              , Relude.Extra.Bifunctor
+                              , Relude.Extra.CallStack
+                              , Relude.Unsafe
+                              )
 
   ghc-options:         -Wall
                        -Wincomplete-uni-patterns
@@ -58,7 +65,6 @@ common common-options
 library
   import:              common-options
   hs-source-dirs:      src
-  other-modules:       Prelude
   exposed-modules:     CakeSlayer
                          CakeSlayer.Db
                          CakeSlayer.Error
@@ -94,8 +100,7 @@ test-suite cake-slayer-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Prelude
-                       Test.Gen
+  other-modules:       Test.Gen
                        Test.Jwt
                        Test.Mock
                        Test.Password
