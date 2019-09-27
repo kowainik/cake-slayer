@@ -1,4 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{- HLINT ignore "Use ?~" -}
 
 {- | Helper functions to write @swagger@ instances easier.
 -}
@@ -14,6 +15,7 @@ import Data.Swagger (Definitions, HasType (type_), NamedSchema (NamedSchema), Re
 import Data.Swagger.Declare (Declare)
 import Relude.Extra.Lens ((.~))
 import Relude.Extra.Type (typeName)
+
 
 {- | Shorter version of 'declareSchemaRef'. So instead of
 
