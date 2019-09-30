@@ -36,7 +36,6 @@ import Database.PostgreSQL.Simple.ToField (ToField)
 import Elm (Elm)
 import Web.HttpApiData (FromHttpApiData)
 
-import CakeSlayer.Has (Has, grab)
 import CakeSlayer.Time (Seconds (..))
 
 import qualified Data.Aeson as Json
@@ -153,13 +152,14 @@ class Monad m => MonadJwt payload m where
 
 -- | Default implementation of token creation.
 mkJwtTokenImpl
-    :: (MonadIO m, MonadReader env m, Has JwtSecret env)
+    :: MonadIO m
     => (JwtPayload payload -> Jwt.ClaimsMap)
+    -> JwtSecret
     -> Seconds
     -> JwtPayload payload
     -> m JwtToken
-mkJwtTokenImpl encode expiry payload = do
-    secret  <- Jwt.hmacSecret . unJwtSecret <$> grab @JwtSecret
+mkJwtTokenImpl encode (JwtSecret jwtSecret) expiry payload = do
+    let secret = Jwt.hmacSecret jwtSecret
     timeNow <- liftIO getPOSIXTime
     let expiryTime = timeNow + fromIntegral (unSeconds expiry)
     let claimsSet = mempty
@@ -170,12 +170,13 @@ mkJwtTokenImpl encode expiry payload = do
 
 -- | Default implementation of token validation.
 verifyJwtTokenImpl
-    :: (MonadIO m, MonadReader env m, Has JwtSecret env)
+    :: MonadIO m
     => (Jwt.ClaimsMap -> Maybe (JwtPayload payload))
+    -> JwtSecret
     -> JwtToken
     -> m (Maybe (JwtPayload payload))
-verifyJwtTokenImpl decode (JwtToken token) = do
-    secret <- Jwt.hmacSecret . unJwtSecret <$> grab @JwtSecret
+verifyJwtTokenImpl decode (JwtSecret jwtSecret) (JwtToken token) = do
+    let secret = Jwt.hmacSecret jwtSecret
     timeNow <- Jwt.numericDate <$> liftIO getPOSIXTime
     pure $ do
         claimsSet <- Jwt.claims <$> Jwt.decodeAndVerifySignature secret token

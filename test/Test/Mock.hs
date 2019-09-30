@@ -6,7 +6,7 @@ module Test.Mock
        , runMockApp
        ) where
 
-import CakeSlayer.Has (Has (..))
+import CakeSlayer.Has (Has (..), grab)
 import CakeSlayer.Jwt (JwtSecret (..), MonadJwt (..), decodeIntIdPayload, encodeIntIdPayload,
                        mkJwtTokenImpl, verifyJwtTokenImpl)
 import CakeSlayer.Monad (App, runApp)
@@ -16,8 +16,13 @@ import CakeSlayer.Monad (App, runApp)
 type MockApp = App () MockEnv
 
 instance MonadJwt Int MockApp where
-    mkJwtToken = mkJwtTokenImpl encodeIntIdPayload
-    verifyJwtToken = verifyJwtTokenImpl decodeIntIdPayload
+    mkJwtToken expiry payload = do
+        secret <- grab @JwtSecret
+        mkJwtTokenImpl encodeIntIdPayload secret expiry payload
+
+    verifyJwtToken token = do
+        secret <- grab @JwtSecret
+        verifyJwtTokenImpl decodeIntIdPayload secret token
 
 -- | Environment for 'MockApp'.
 newtype MockEnv = MockEnv

@@ -17,6 +17,7 @@ module CakeSlayer.Monad
 import Control.Exception (catch, throwIO, try)
 import Control.Monad.Except (MonadError (..))
 import Control.Monad.IO.Unlift (MonadUnliftIO (..))
+import Prometheus (MonadMonitor (..))
 import Relude.Extra.Bifunctor (firstF)
 
 import CakeSlayer.Error (AppException (..), ErrorWithSource)
@@ -34,6 +35,18 @@ examples below:
 @
 __type__ App     = CakeSlayer.'App' AppError  AppEnv
 __type__ MockApp = CakeSlayer.'App' TestError MockEnv
+@
+
+Alternatively you can create your own @__newtype__@ if you have problems with
+mutually recursive type aliases or orphan instances.
+
+@
+__newtype__ App a = App
+    { unApp :: CakeSlayer.'App' AppError AppEnv a
+    } __deriving newtype__ ( Functor, Applicative, Monad, MonadIO
+                       , MonadUnliftIO, MonadReader AppEnv
+                       , MonadError (ErrorWithSource AppError)
+                       )
 @
 -}
 newtype App (err :: Type) env a = App
@@ -62,6 +75,12 @@ instance (Show err, Typeable err)
         let ioAction = runApp env action
         ioAction `catch` \(AppException e) -> runApp env $ handler e
     {-# INLINE catchError #-}
+
+-- | This instances is required for the @prometheus-client@ library.
+instance MonadMonitor (App err env) where
+    doIO :: IO () -> App err env ()
+    doIO = liftIO
+    {-# INLINE doIO #-}
 
 {- | Run application by providing environment.
 
