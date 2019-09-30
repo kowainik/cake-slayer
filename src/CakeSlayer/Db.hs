@@ -14,6 +14,7 @@ module CakeSlayer.Db
        , queryRaw
        , query
        , queryNamed
+       , queryWith
        , queryWithNamed
        , executeRaw
        , executeRaw_
@@ -32,10 +33,14 @@ module CakeSlayer.Db
        , asSingleRowWith
        , failParsingWith
 
+         -- * Deriving helpers
+       , JsonField (..)
+
          -- * Internal helpers
        , withPool
        ) where
 
+import Data.Aeson (FromJSON, ToJSON)
 import Database.PostgreSQL.Simple (FromRow, ToRow)
 import PgNamed (NamedParam, PgNamedError)
 
@@ -44,9 +49,10 @@ import CakeSlayer.Has (Has, grab)
 
 import qualified Data.Pool as Pool
 import qualified Database.PostgreSQL.Simple as Sql
-import qualified Database.PostgreSQL.Simple.FromField as Sql (conversionError)
+import qualified Database.PostgreSQL.Simple.FromField as Sql
 import qualified Database.PostgreSQL.Simple.FromRow as Sql
 import qualified Database.PostgreSQL.Simple.Migration as Sql
+import qualified Database.PostgreSQL.Simple.ToField as Sql
 import qualified PgNamed as Sql
 
 ----------------------------------------------------------------------------
@@ -103,6 +109,19 @@ queryNamed
 queryNamed q params =
     withPool (\conn -> runExceptT $ Sql.queryNamed conn q params) >>= liftError
 {-# INLINE queryNamed #-}
+
+{- | Performs a query with parameters and custom 'RowParser' and returns a
+list of rows.
+-}
+queryWith
+    :: (WithDb env m, ToRow args)
+    => Sql.RowParser res
+    -> Sql.Query
+    -> args
+    -> m [res]
+queryWith rowParser q params =
+    withPool $ \conn -> Sql.queryWith rowParser conn q params
+{-# INLINE queryWith #-}
 
 {- | Performs a query with named parameters and custom 'RowParser' and returns a
 list of rows.
@@ -229,6 +248,34 @@ asSingleRowWith err action = throwOnNothingM err (viaNonEmpty head <$> action)
 failParsingWith :: (Show err, Typeable err) => err -> Sql.RowParser a
 failParsingWith err =
     Sql.fieldWith (\_ _ -> Sql.conversionError $ toNoSourceException err)
+
+----------------------------------------------------------------------------
+-- Deriving helpers
+----------------------------------------------------------------------------
+
+{- | Data type helper to derive 'ToField' and 'FromField' instances for @json@
+and @jsonb@ PostgreSQL types using @DerivingVia@ language extensions.
+
+Use it like this:
+
+@
+__data__ Mood = Mood
+    { moodTime  :: Int
+    , moodValue :: Int
+    } __deriving__ (FromField, ToField) __via__ 'JsonField' Mood
+@
+-}
+newtype JsonField a = JsonField
+    { unJsonField :: a
+    }
+
+instance (FromJSON a, Typeable a) => Sql.FromField (JsonField a) where
+    fromField sqlField mdata = JsonField <$> Sql.fromJSONField sqlField mdata
+    {-# INLINE fromField #-}
+
+instance ToJSON a => Sql.ToField (JsonField a) where
+    toField = Sql.toJSONField . unJsonField
+    {-# INLINE toField #-}
 
 ----------------------------------------------------------------------------
 -- Helpers

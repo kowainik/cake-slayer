@@ -76,6 +76,7 @@ instance (Show err, Typeable err)
         ioAction `catch` \(AppException e) -> runApp env $ handler e
     {-# INLINE catchError #-}
 
+-- | This instances is required for the @prometheus-client@ library.
 instance MonadMonitor (App err env) where
     doIO :: IO () -> App err env ()
     doIO = liftIO
