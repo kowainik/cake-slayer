@@ -1,9 +1,18 @@
+{-# LANGUAGE AllowAmbiguousTypes  #-}
+{-# LANGUAGE DataKinds            #-}
+{-# LANGUAGE UndecidableInstances #-}
+
 -- | This module introduces the type class 'Has'.
 
 module CakeSlayer.Has
        ( Has (..)
        , grab
+
+       , Field (..)
        ) where
+
+import GHC.Records (HasField (getField))
+import GHC.TypeLits (Symbol)
 
 
 {- | General type class representing which @field@ is in @env@.
@@ -56,3 +65,69 @@ class Has field env where
 grab :: forall field env m . (MonadReader env m, Has field env) => m field
 grab = asks $ obtain @field
 {-# INLINE grab #-}
+
+
+{- | The newtype for deriving via mechanism for 'Has' class. Let's see how
+it's supposed to be used.
+
+Imagine that we have a data type like this:
+
+@
+__data__ Env = Env
+    { envInt :: !'Int'
+    , envString :: !'String'
+    }
+@
+
+GHC generates the following 'HasField' instances automatically:
+
+@
+__instance__ 'HasField' "envInt" Env 'Int' __where__
+    'getField' :: Env -> 'Int'
+    'getField' = envInt
+
+__instance__ 'HasField' "envString" Env 'String' __where__
+    'getField' :: Env -> 'String'
+    'getField' = envString
+@
+
+You can have now see that using @'getField' \@\"envInt\"@ is equivalent to @envInt@.
+
+So, that means that it's possible to improve 'Has' instances interface and remove some boilerplate.
+
+Instead of writing the following code:
+
+@
+__data__ Env = Env
+    { envInt :: !'Int'
+    , envString :: !'String'
+    }
+
+__instance__ 'Has' 'Int' Env __where__
+    'obtain' = envInt
+    {-# INLINE 'obtain' #-}
+
+__instance__ 'Has' 'String' Env __where__
+    'obtain' = envString
+    {-# INLINE 'obtain' #-}
+@
+
+It should be possible to write it using `DerivingVia` extension:
+
+@
+data Env = Env
+    { envInt :: !Int
+    , envString :: !String
+    } deriving (Has Int) via Field "envInt" Int Env
+      deriving (Has String) via Field "envString" String Env
+@
+
+__ NOTE:__ This only works starting with @GHC-8.6@.
+-}
+newtype Field (s :: Symbol) field env = Field
+    { unField :: env
+    }
+
+instance forall s f env . (HasField s env f) => Has f (Field s f env) where
+    obtain = getField @s . unField
+    {-# INLINE obtain #-}
