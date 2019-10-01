@@ -7,6 +7,7 @@ module CakeSlayer
        , module CakeSlayer.Monad
        , module CakeSlayer.Password
        , module CakeSlayer.Random
+       , module CakeSlayer.Servant
        , module CakeSlayer.Swagger
        , module CakeSlayer.Time
        ) where
@@ -19,5 +20,6 @@ import CakeSlayer.Measure
 import CakeSlayer.Monad
 import CakeSlayer.Password
 import CakeSlayer.Random
+import CakeSlayer.Servant
 import CakeSlayer.Swagger
 import CakeSlayer.Time
