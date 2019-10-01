@@ -76,6 +76,7 @@ library
                          CakeSlayer.Monad
                          CakeSlayer.Password
                          CakeSlayer.Random
+                         CakeSlayer.Servant
                          CakeSlayer.Swagger
                          CakeSlayer.Time
 
@@ -94,6 +95,8 @@ library
                      , random ^>= 1.1
                      , resource-pool ^>= 0.2.3.2
                      , scientific ^>= 0.3.6
+                     , servant >= 0.15 && < 0.17
+                     , servant-server >= 0.15 && < 0.17
                      , swagger2 ^>= 2.4
                      , time >= 1.8 && < 1.10
                      , unliftio-core ^>= 0.1.2.0
