@@ -22,18 +22,18 @@ our own type, transparent for frontend.
 newtype SqlArray a = SqlArray
     { unSqlArray :: [a]
     } deriving stock (Generic, Show)
-      deriving newtype (Eq, FromJSON, ToJSON)
-
-instance Elm a => Elm (SqlArray a) where
-    toElmDefinition _ = toElmDefinition (Proxy @[a])
+      deriving newtype (Eq, FromJSON, ToJSON, Elm)
 
 instance ToSchema a => ToSchema (SqlArray a) where
     declareNamedSchema _ = declareNamedSchema (Proxy @[a])
+    {-# INLINE declareNamedSchema #-}
 
 instance ToField a => ToField (SqlArray a) where
     toField :: SqlArray a -> Action
     toField = coerce @(PGArray a -> Action) toField
+    {-# INLINE toField #-}
 
 instance (FromField a, Typeable a) => FromField (SqlArray a) where
     fromField :: FieldParser (SqlArray a)
     fromField = coerce @(FieldParser (PGArray a)) fromField
+    {-# INLINE fromField #-}
