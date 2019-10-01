@@ -91,7 +91,7 @@ __instance__ 'HasField' "envString" Env 'String' __where__
     'getField' = envString
 @
 
-You can have now see that using @'getField' \@\"envInt\"@ is equivalent to @envInt@.
+You can now see that using @'getField' \@\"envInt\"@ is equivalent to @envInt@.
 
 So, that means that it's possible to improve 'Has' instances interface and remove some boilerplate.
 
