@@ -48,7 +48,7 @@ type PrometheusRegistry = IORef (HashMap Text Histogram)
 -- | Constraint for the monadic actions that have access to measurements.
 type MonadMeasure m = (HasCallStack, MonadTimed m)
 
-{- | Basic implementation of 'timeAction' function for 'MonadTimed' instances.
+{- | Basic implementation of 'timedAction' function for 'MonadTimed' instances.
 
 It measures the time taken to perform the given action and store it
 in the @timings@ distribution with the label of the action.
@@ -60,7 +60,7 @@ __Usage examples:__
 
 @
 __instance__ 'MonadTimed' App __where__
-    'timedAction' = timedActionImplWith myMetrics
+    'timedAction' = 'timedActionImplWith' myMetrics \"MY_APP\"
       __where__
         myMetrics :: 'Text' -> 'Double' -> App ()
         myMetrics label time = __do__

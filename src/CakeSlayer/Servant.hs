@@ -20,9 +20,9 @@ import Servant.Server.Generic (AsServerT)
 Should be used qualified to be applied to your app:
 
 @
-__import__ qualified CakeSlayer
+__import qualified__ CakeSlayer
 
-__type__ MyAppServer = CakeSlayer.AppServer App
+__type__ MyAppServer = CakeSlayer.'AppServer' App
 @
 -}
 type AppServer app = AsServerT app

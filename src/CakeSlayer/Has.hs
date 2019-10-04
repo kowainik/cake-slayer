@@ -46,7 +46,7 @@ foo = do
 you could use 'Has' type class like this:
 
 @
-foo :: (MonadReader env m, Has JwtSecret m) => ...
+foo :: (MonadReader env m, 'Has' JwtSecret m) => ...
 foo = do
     secret <- asks $ 'obtain' @JwtSecret
 @
@@ -54,7 +54,7 @@ foo = do
 and instead of @asks + obtain@ use utility function 'grab':
 
 @
-foo :: (MonadReader env m, Has JwtSecret m) => ...
+foo :: (MonadReader env m, 'Has' JwtSecret m) => ...
 foo = do
     secret <- 'grab' @JwtSecret
 @

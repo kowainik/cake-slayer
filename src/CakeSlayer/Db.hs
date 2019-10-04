@@ -1,4 +1,5 @@
-{- | Wrappers around @postgresql-simple@ and @postgresql-simple-named@ libraries.
+{- | Wrappers around [postgresql-simple](https://hackage.haskell.org/package/postgresql-simple)
+and [postgresql-simple-named](https://hackage.haskell.org/package/postgresql-simple-named) libraries.
 Instead of working with the database connection as an argument, functions in
 this module work with 'MonadReader' that has access to environment with pool of
 connections.
@@ -113,7 +114,7 @@ getJohnUserIds = 'query' [sql|
     __SELECT__ id
     __FROM__ users
     __WHERE__ name = ?
-    |] (Only "John")
+    |] (Only \"John\")
 @
 -}
 query
@@ -129,7 +130,8 @@ query q args = withPool $ \conn -> Sql.query conn q args
 Similar to 'query' but works with 'NamedParam' instead.
 
 You can find more about named parameters in the @postgresql-simple-named@ library:
-  * <https://hackage.haskell.org/package/postgresql-simple-named>
+
+* <https://hackage.haskell.org/package/postgresql-simple-named>
 
 __Example:__
 
@@ -139,7 +141,7 @@ getJohnUserIds = 'queryNamed' [sql|
     __SELECT__ id
     __FROM__ users
     __WHERE__ name = ?name
-    |] [ "name" '=?' "John" ]
+    |] [ "name" '=?' \"John\" ]
 @
 -}
 queryNamed

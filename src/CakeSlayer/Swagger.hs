@@ -37,7 +37,7 @@ schemaRef = declareSchemaRef (Proxy @t)
 {- | Helper function to return named schemas. So instead of:
 
 @
-pure $ 'NamedSchema' (Just "LoginResponse") $ 'mempty'
+pure $ 'NamedSchema' (Just \"LoginResponse\") $ 'mempty'
     & type_ .~ SwaggerObject
     & properties .~ fromList
         [ ("jwtToken", jwtTokenSchema)

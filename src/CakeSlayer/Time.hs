@@ -30,7 +30,7 @@ newtype Seconds = Seconds
 threadDelay :: MonadIO m => Seconds -> m ()
 threadDelay (Seconds s) = liftIO $ C.threadDelay (s * 10 ^ (6 :: Int))
 
--- | Number of 'Second's in a day
+-- | Number of 'Seconds' in a day
 dayInSeconds :: Seconds
 dayInSeconds = Seconds $ 60 * 60 * 24
 {-# INLINE dayInSeconds #-}
