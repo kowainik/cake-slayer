@@ -15,9 +15,12 @@ mkRandomDigits :: (MonadIO m) => Int -> m Text
 mkRandomDigits len = toText . take len . randomRs ('0', '9') <$> liftIO newStdGen
 
 {- | Make a random string comprised of the following letters of a given length:
+
 1. Lowercase characters @[a..z]@
 2. Uppercase characters @[A..Z]@
 3. Digits @[0..9]@.
+
+Returns empty string if given length is less than zero.
 -}
 mkRandomString
     :: MonadIO m

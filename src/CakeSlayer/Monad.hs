@@ -43,9 +43,9 @@ mutually recursive type aliases or orphan instances.
 @
 __newtype__ App a = App
     { unApp :: CakeSlayer.'App' AppError AppEnv a
-    } __deriving newtype__ ( Functor, Applicative, Monad, MonadIO
-                       , MonadUnliftIO, MonadReader AppEnv
-                       , MonadError (ErrorWithSource AppError)
+    } __deriving newtype__ ( 'Functor', 'Applicative', 'Monad', 'MonadIO'
+                       , 'MonadUnliftIO', 'MonadReader' AppEnv
+                       , 'MonadError' ('ErrorWithSource' AppError)
                        )
 @
 -}

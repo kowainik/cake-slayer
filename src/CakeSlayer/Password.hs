@@ -26,7 +26,9 @@ newtype PasswordHash = PasswordHash
     } deriving stock (Show, Generic)
       deriving newtype (Eq, FromField, ToField)
 
--- | Unsafe function for constructing 'PasswordHash'. Used only for testing.
+{- | Unsafe function for constructing 'PasswordHash'.
+Should be used only for testing.
+-}
 unsafePwdHash :: Text -> PasswordHash
 unsafePwdHash = PasswordHash
 
@@ -64,11 +66,16 @@ mkPasswordHash
     => PasswordPlainText
     -> m (Maybe PasswordHash)
 mkPasswordHash = mkPasswordHashWithPolicy BC.slowerBcryptHashingPolicy
+{-# INLINE mkPasswordHash #-}
 
+{- | Verifies that given 'PasswordPlainText' satisfies the 'PasswordHash'.
+-}
 verifyPassword :: PasswordPlainText -> PasswordHash -> Bool
 verifyPassword (PasswordPlainText password) (PasswordHash hash) =
     BC.validatePassword (encodeUtf8 hash) (encodeUtf8 password)
+{-# INLINE verifyPassword #-}
 
 -- | Generate random password of the given length.
 generateRandomPassword :: MonadIO m => Int -> m PasswordPlainText
 generateRandomPassword n = PasswordPlainText <$> mkRandomString n
+{-# INLINE generateRandomPassword #-}

@@ -4,32 +4,32 @@ In your application you should create your custom error data type like this one:
 @
 - | App errors type.
 __data__ AppErrorType
-    {- | General not found. -}
+    \{\- | General not found. \-\}
     = NotFound
 
-    {- | Some exceptional circumstance has happened to stop execution and return.
+    \{\- | Some exceptional circumstance has happened to stop execution and return.
     Optional text to provide some context in server logs.
-    -}
+    \-\}
     | ServerError Text
 
-    {- | A required permission level was not met. Optional text to provide some context. -}
+    \{\- | A required permission level was not met. Optional text to provide some context. \-\}
     | NotAllowed Text
 
-    {- | Given inputs do not conform to the expected format or shape. Optional
+    \{\- | Given inputs do not conform to the expected format or shape. Optional
     text to provide some context in server logs.
-    -}
+    \-\}
     | Invalid Text
 
-    {- | Some header expected, but not present in header list.
-    -}
+    \{\- | Some header expected, but not present in header list.
+    \-\}
     | MissingHeader HeaderName
 
-    {- | An authentication header that was required was provided but not in a
+    \{\- | An authentication header that was required was provided but not in a
     format that the server can understand.
-    -}
+    \-\}
     | HeaderDecodeError Text
 
-    {- | Data base specific errors. -}
+    \{\- | Data base specific errors. \-\}
     | DbError Text
 @
 

@@ -52,7 +52,7 @@ You can use functions from "CakeSlayer.Random" module to create random
 'JwtSecret' at the start of your application like this:
 
 @
-jwtSecret <- 'JwtSecret' <$> mkRandomString 10
+jwtSecret <- 'JwtSecret' \<$\> mkRandomString 10
 @
 -}
 newtype JwtSecret = JwtSecret
@@ -75,7 +75,7 @@ newtype JwtToken = JwtToken
 need to specify two functions:
 
 1. How to encode 'JwtPayload' as 'Jwt.ClaimsMap'.
-2. How to decode 'JwtPayload from 'Jwt.ClaimsMap'.
+2. How to decode 'JwtPayload' from 'Jwt.ClaimsMap'.
 
 See examples in this module: 'encodeIntIdPayload', 'decodeIntIdPayload',
 'encodeTextIdPayload', 'decodeTextIdPayload'.
