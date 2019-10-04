@@ -39,7 +39,10 @@ class Monad m => MonadTimed m where
     timedAction :: HasCallStack => m a -> m a
 
 
+-- | A type alias for map of 'Distribution's.
 type Timings = IORef (Map Text Distribution)
+
+-- | A type alias for map of 'Histogram' for @prometheus@ metrics.
 type PrometheusRegistry = IORef (HashMap Text Histogram)
 
 -- | Constraint for the monadic actions that have access to measurements.

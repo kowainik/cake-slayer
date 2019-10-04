@@ -8,6 +8,7 @@ module CakeSlayer.Has
        ( Has (..)
        , grab
 
+         -- * Deriving helpers
        , Field (..)
        ) where
 

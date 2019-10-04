@@ -1,3 +1,7 @@
+{- | Helper functions and data types to work with time,
+including 'UTCTime' helpers.
+-}
+
 module CakeSlayer.Time
        ( -- * 'Seconds' related functions
          Seconds (..)
