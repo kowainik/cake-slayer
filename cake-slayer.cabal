@@ -2,7 +2,9 @@ cabal-version:       2.4
 name:                cake-slayer
 version:             0.0.0.0
 synopsis:            Architecture of Haskel backend applications
-description:         Architecture of Haskel backend applications
+description:
+    The package provides backbone for your Haskell web-application backend.
+    See README for more details.
 homepage:            https://github.com/Holmusk/cake-slayer
 bug-reports:         https://github.com/Holmusk/cake-slayer/issues
 license:             MPL-2.0
