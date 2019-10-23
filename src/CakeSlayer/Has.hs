@@ -122,17 +122,17 @@ It should be possible to write it using @DerivingVia@ extension:
 __data__ Env = Env
     { envInt :: !'Int'
     , envString :: !'String'
-    } __deriving__ ('Has' Int)    __via__ 'Field' "envInt" 'Int' Env
-      __deriving__ ('Has' String) __via__ 'Field' "envString" 'String' Env
+    } __deriving__ ('Has' Int)    __via__ 'Field' "envInt" Env
+      __deriving__ ('Has' String) __via__ 'Field' "envString" Env
 @
 
 __ NOTE:__ This only works starting with @GHC-8.6@.
 -}
-newtype Field (s :: Symbol) field env = Field
+newtype Field (s :: Symbol) env = Field
     { unField :: env
     }
 
-instance forall s f env . (HasField s env f) => Has f (Field s f env) where
-    obtain :: Field s f env -> f
+instance forall s f env . (HasField s env f) => Has f (Field s env) where
+    obtain :: Field s env -> f
     obtain = getField @s . unField
     {-# INLINE obtain #-}
