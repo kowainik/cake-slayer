@@ -1,7 +1,6 @@
 module Main (main) where
 
 import Hedgehog (Group (..), checkParallel)
-import System.IO (hSetEncoding, utf8)
 
 import CakeSlayer.Jwt (decodeIntIdPayload, decodeTextIdPayload, encodeIntIdPayload,
                        encodeTextIdPayload)
@@ -24,9 +23,5 @@ hedgehogTests = Group "Roundtrip properties"
     named = (,)
 
 main :: IO ()
-main =  do
-    -- fix terminal encoding
-    hSetEncoding stdout utf8
-    hSetEncoding stderr utf8
-
+main =
     ifM (checkParallel hedgehogTests) exitSuccess exitFailure
