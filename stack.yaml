@@ -4,7 +4,8 @@ extra-deps:
   - elm-street-0.1.0.4
   - postgresql-simple-migration-0.1.15.0
   - prometheus-client-1.1.0
-  - data-sketches-0.3.1.0  # for prometheus
+  - data-sketches-0.3.1.0       # for prometheus
+  - data-sketches-core-0.1.0.0  # for prometheus
   - relude-1.0.0.1
 
   - github: holmusk/postgresql-simple-named
