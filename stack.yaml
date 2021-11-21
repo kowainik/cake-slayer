@@ -1,6 +1,6 @@
-resolver: lts-14.7
+resolver: lts-18.7
 
 extra-deps:
-  - elm-street-0.1.0.2
-  - postgresql-simple-named-0.0.2.0
-
+  - elm-street-0.1.0.4
+  - github: holmusk/postgresql-simple-named
+    commit: 394e6ff593666616f78f59a7b4817608a2950370
