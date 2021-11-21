@@ -2,5 +2,9 @@ resolver: lts-18.7
 
 extra-deps:
   - elm-street-0.1.0.4
+  - postgresql-simple-migration-0.1.15.0
+  - prometheus-client-1.1.0
+  - relude-1.0.0.1
+
   - github: holmusk/postgresql-simple-named
     commit: 394e6ff593666616f78f59a7b4817608a2950370
