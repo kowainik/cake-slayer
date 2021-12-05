@@ -1,48 +1,53 @@
 cabal-version:       2.4
 name:                cake-slayer
-version:             0.0.0.0
+version:             0.0.1.0
 synopsis:            Architecture of Haskel backend applications
 description:
     The package provides backbone for your Haskell web-application backend.
     See README for more details.
-homepage:            https://github.com/Holmusk/cake-slayer
-bug-reports:         https://github.com/Holmusk/cake-slayer/issues
+homepage:            https://github.com/kowainik/cake-slayer
+bug-reports:         https://github.com/kowainik/cake-slayer/issues
 license:             MPL-2.0
 license-file:        LICENSE
 author:              Dmitrii Kovanikov, Veronika Romashkina
-maintainer:          Holmusk <tech@holmusk.com>
-copyright:           2019 Holmusk
+maintainer:          Kowainik <xrom.xkov@gmail.com>
+copyright:           2019 Holmusk, 2019-2021 Kowainik
 category:            Web, Backend, Framework
 build-type:          Simple
 extra-doc-files:     README.md
                      CHANGELOG.md
-tested-with:         GHC == 8.4.4
-                     GHC == 8.6.5
+tested-with:         GHC == 8.10.7
 
 source-repository head
   type:                git
-  location:            https://github.com/Holmusk/cake-slayer.git
+  location:            https://github.com/kowainik/cake-slayer.git
 
 common common-options
-  build-depends:       base >= 4.11.0.0 && < 4.13
-                     , relude ^>= 0.5.0
+  build-depends:       base ^>= 4.14
+                     , relude ^>= 1.0
 
   mixins:              base hiding (Prelude)
-                     , relude (Relude as Prelude
-                              , Relude.Extra.Bifunctor
-                              , Relude.Extra.CallStack
-                              , Relude.Extra.Lens
-                              , Relude.Extra.Type
-                              , Relude.Unsafe
-                              )
+                     , relude (Relude as Prelude)
+                     , relude
 
   ghc-options:         -Wall
-                       -Wincomplete-uni-patterns
-                       -Wincomplete-record-updates
                        -Wcompat
                        -Widentities
+                       -Wincomplete-uni-patterns
+                       -Wincomplete-record-updates
                        -Wredundant-constraints
                        -fhide-source-paths
+                       -Wmissing-export-lists
+                       -Wpartial-fields
+  if impl(ghc >= 8.8)
+    ghc-options:       -Wmissing-deriving-strategies
+  if impl(ghc >= 8.10)
+    ghc-options:       -Wunused-packages
+  if impl(ghc >= 9.0)
+    ghc-options:       -Winvalid-haddock
+  if impl(ghc >= 9.2)
+    ghc-options:       -Wredundant-bang-patterns
+                       -Woperator-whitespace
 
   default-language:    Haskell2010
   default-extensions:  ConstraintKinds
@@ -83,7 +88,7 @@ library
                          CakeSlayer.Swagger
                          CakeSlayer.Time
 
-  build-depends:       aeson ^>= 1.4
+  build-depends:       aeson ^>= 1.5
                      , bcrypt ^>= 0.0.11
                      , containers
                      , ekg-core ^>= 0.1.1.6
@@ -94,15 +99,15 @@ library
                      , postgresql-simple ^>= 0.6.2
                      , postgresql-simple-migration ^>= 0.1.14.0
                      , postgresql-simple-named ^>= 0.0.2.0
-                     , prometheus-client ^>= 1.0.0
-                     , random ^>= 1.1
+                     , prometheus-client ^>= 1.1.0
+                     , random ^>= 1.2
                      , resource-pool ^>= 0.2.3.2
                      , scientific ^>= 0.3.6
-                     , servant >= 0.15 && < 0.17
-                     , servant-server >= 0.15 && < 0.17
-                     , swagger2 ^>= 2.4
-                     , time >= 1.8 && < 1.10
-                     , unliftio-core ^>= 0.1.2.0
+                     , servant ^>= 0.18
+                     , servant-server ^>= 0.18
+                     , swagger2 ^>= 2.6
+                     , time ^>= 1.9
+                     , unliftio-core ^>= 0.2
                      , unordered-containers ^>= 0.2.10.0
 
 test-suite cake-slayer-test

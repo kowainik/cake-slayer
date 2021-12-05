@@ -23,7 +23,8 @@ import qualified Control.Concurrent as C (threadDelay)
 -- | Represents the amount of seconds.
 newtype Seconds = Seconds
     { unSeconds :: Int
-    } deriving (Show, Eq)
+    } deriving stock (Show)
+      deriving newtype (Eq)
 
 
 -- | Similar to 'C.threadDelay' but receives 'Seconds' instead of 'Int'.

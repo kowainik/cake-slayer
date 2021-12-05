@@ -1,0 +1,6 @@
+packages: .
+
+source-repository-package
+    type: git
+    location: https://github.com/holmusk/postgresql-simple-named.git
+    tag: 394e6ff593666616f78f59a7b4817608a2950370
